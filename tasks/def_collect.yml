@@ -1,0 +1,19 @@
+---
+# vim: ts=2:sw=2:sts=2:et:ft=yaml.ansible
+#
+# Check if the collection metadata file exists and if it does, load it
+# into the ansible_collection_meta dictionary.
+#
+########################################################################
+
+- name: The collection metadata file exists
+  ansible.builtin.stat:
+    path: "{{ collect_meta_file_var }}"
+  failed_when: false
+  register: collect_meta_file_stat_reg
+
+- name: Define collection metadata
+  ansible.builtin.include_vars:
+    file: "{{ collect_meta_file_var }}"
+    name: ansible_collection_meta
+  when: collect_meta_file_stat_reg['stat']['isreg'] | default(false)

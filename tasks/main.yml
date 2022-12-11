@@ -1,0 +1,39 @@
+---
+# vim: ts=2:sw=2:sts=2:et:ft=yaml.ansible
+#
+# Generate comment and inventory boilerplate
+#
+########################################################################
+
+- name: Run once on localhost
+  run_once: true
+  delegate_to: 127.0.0.1
+  block:
+
+    # If using a collection, pull its metadata into a variable.
+    - name: Define collection
+      ansible.builtin.include_tasks: def_collect.yml
+      vars:
+        collect_meta_file_var: "{{  ansible_parent_role_paths
+                                    | default( [role_path] )
+                                    | first
+                                    | dirname
+                                    | dirname }}/galaxy.yml"
+
+    # The comment header will include collection metadata or will fall
+    # back to using role metadata if running outside of a collection.
+    - name: Run tasks to define comment header
+      ansible.builtin.include_tasks: def_comment_header.yml
+
+    # Apply inventory boilerplate in cases where inventory, host and
+    # group variables files don't exist. Do not modify any files that
+    # do exist.
+    - name: Run tasks to configure inventory directories and variables files
+      ansible.builtin.include_tasks: cfg_inv.yml
+
+    # If automatic git versioning will be used on the inventory, set up
+    # the repository and make a preliminary commit unless there are no
+    # pending changes.
+    - name: Run tasks to configure git versioning of the inventory
+      ansible.builtin.include_tasks: cfg_git.yml
+      when: inv_git == true

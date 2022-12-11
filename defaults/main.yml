@@ -1,0 +1,69 @@
+---
+# vim: ts=2:sw=2:sts=2:et:ft=yaml.ansible
+#
+# Inventory defaults
+#
+########################################################################
+
+# Use git to automatically version inventory files.
+inv_git: true
+# Use Ansible's backup feature when making changes to inventory files.
+inv_bu: false
+
+# Comment defaults (written to group_vars/all.yml)
+default_comment_prefix: "# vim: ts=8:sw=8:sts=8:noet:ft=cfg\n#"
+ansible_comment_prefix: "# vim: ts=2:sw=2:sts=2:et:ft=yaml.ansible\n#"
+yaml_comment_prefix: "# vim: ts=2:sw=2:sts=2:et:ft=yaml\n#"
+yaml_python_prefix: "# vim: ts=4:sw=4:sts=4:et:ft=python\n#"
+# 72 character comment width per PEP8
+default_comment_postfix: "#\n\
+  ########################################################################"
+safe_zone_comment: "\
+  # ADD CUSTOM CONFIGURATION BELOW #######################################"
+
+# Operating system defaults (written to group_vars/all.yml)
+arch_defaults:
+  archlinux: x86_64
+  centos: x86_64
+  debian: amd64
+  fedora: x86_64
+  freebsd: amd64
+  openbsd: amd64
+  rocky: x86_64
+  ubuntu: amd64
+
+repo_defaults:
+  archlinux:
+    https:
+      - geo.mirror.pkgbuild.com
+  centos:
+    https:
+      - mirror.centos.org/centos
+  debian:
+    https:
+      - deb.debian.org/debian
+  fedora:
+    https:
+      - mirrors.fedoraproject.org/fedora
+  freebsd:
+    https:
+      - ftp.FreeBSD.org
+  openbsd:
+    https:
+      - cdn.openbsd.org/pub/OpenBSD
+  rocky:
+    https:
+      - mirrors.rockylinux.org
+  ubuntu:
+    https:
+      - mirrors.edge.kernel.org/ubuntu
+
+# Values here relate to mirror paths
+release_defaults:
+  archlinux: latest
+  centos: '7.9.2009'
+  debian: '11.4.0'
+  fedora: '36'
+  freebsd: '13.1'
+  openbsd: '7.1'
+  ubuntu: 'jammy' #22.04 LTS

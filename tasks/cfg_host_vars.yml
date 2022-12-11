@@ -1,0 +1,31 @@
+---
+# vim: ts=2:sw=2:sts=2:et:ft=yaml.ansible
+#
+# Configure host_vars/host.yml files
+#
+########################################################################
+
+- name: Template host variables file if it doesn't exist
+  ansible.builtin.template:
+    src: host_vars.yml.j2
+    dest: "{{ hv_file_var}}"
+    mode: 0644
+    force: false
+    backup: "{{ inv_bu }}"
+  vars:
+    title_var: "Host Variables - {{ host_item }}"
+    header_var: "\
+      {{  ( title_var + '\n \n' + default_comment_header )
+          | wordwrap(70)
+          | comment(  prefix=yaml_comment_prefix,
+                      postfix=default_comment_postfix ) }}"
+  notify: git commit inventory
+
+- name: Write YAML header to host variables file
+  ansible.builtin.lineinfile:
+    path: "{{ hv_file_var }}"
+    insertbefore: BOF
+    line: ---
+    mode: 0644
+    backup: "{{ inv_bu }}"
+  notify: git commit inventory

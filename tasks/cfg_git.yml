@@ -1,0 +1,96 @@
+---
+# vim: ts=2:sw=2:sts=2:et:ft=yaml.ansible
+#
+# Configure inventory versioning with git
+#
+########################################################################
+
+# Need this when called by the handler
+- name: Run once on localhost
+  delegate_to: 127.0.0.1
+  run_once: true
+  block:
+
+    # Replicate check_mode behavior
+    - name: Check if the inventory git repository is initialized
+      ansible.builtin.command:
+        argv:
+          - git
+          - rev-parse
+          - --show-toplevel
+        chdir: "{{ inventory_dir }}"
+      register: git_inv_tl_reg
+      failed_when: git_inv_tl_reg['rc'] | int not in [0, 128]
+      changed_when:
+        - ansible_check_mode == true
+        - >-
+          git_inv_tl_reg['rc'] | int == 128
+          or git_inv_tl_reg['stdout_lines'][0] != inventory_dir
+
+    - name: Initialize a local git repository in the inventory directory
+      ansible.builtin.command:
+        argv:
+          - git
+          - init
+        chdir: "{{ inventory_dir }}"
+      when:
+        - ansible_check_mode == false
+        - >-
+          git_inv_tl_reg['rc'] | int == 128
+          or git_inv_tl_reg['stdout_lines'][0] != inventory_dir
+
+    - name: Check if any inventory files are modified or untracked
+      ansible.builtin.command:
+        argv:
+          - git
+          - ls-files
+          - --modified
+          - --deleted
+          - --others
+          - --exclude-standard
+        chdir: "{{ inventory_dir }}"
+      register: git_inv_mod_untracked_reg
+      changed_when:
+        - ansible_check_mode == true
+        - git_inv_mod_untracked_reg['stdout_lines'] != []
+
+    - name: Add all files in the inventory directory to the git repository
+      ansible.builtin.command:
+        argv:
+          - git
+          - add
+          - .
+        chdir: "{{ inventory_dir }}"
+      when:
+        - ansible_check_mode == false
+        - git_inv_mod_untracked_reg['stdout_lines'] != []
+
+    - name: List commits to the local inventory repository
+      ansible.builtin.command:
+        argv:
+          - git
+          - diff
+          - --cached
+          - --name-only
+        chdir: "{{ inventory_dir }}"
+      register: git_inv_cache_mod_reg
+      changed_when:
+        - ansible_check_mode == true
+        - git_inv_cache_mod_reg['stdout_lines'] != []
+
+    # If commit signing is enabled and a Yubikey is used for signing,
+    # a press and/or PIN entry may be required here.
+    - name: Create a commit for the inventory [YUBIKEY PRESS]
+      ansible.builtin.command:
+        argv:
+          - git
+          - commit
+          - "--message={{ msg_var }}"
+        chdir: "{{ inventory_dir }}"
+      vars:
+        msg_var: "Automatic commit by the {{ byline }}"
+      when:
+        - ansible_check_mode == false
+        - >-
+          git_inv_cache_mod_reg['stdout_lines'] != []
+          or git_inv_mod_untracked_reg['stdout_lines'] != []
