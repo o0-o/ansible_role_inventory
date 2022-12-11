@@ -1,26 +1,30 @@
 # o0_o.inventory
 
-This Ansible role generates inventory boilerplate on localhost.
+This Ansible role generates inventory boilerplate on `localhost`.
 
 ## Requirements
 
-Only one inventory source should be provided and it should be a directory. If the inventory source does not exist, it will be created as a directory.
+Only one inventory source should be provided and it should be a directory. If multiple inventory sources are provided, boilerplate is written to the first, which must be a directory. If the inventory source does not exist, it will be created as a directory.
 
 ## Role Variables
 
 ### Defaults
 
+#### Automatic inventory versioning and/or backup
+
 ```yaml
 inv_git: true
 ```
 
-This variable controls whether or not to automatically handle versioning of the inventory with `git`. If set to `true` and a repository doesn't exist in the inventory directory, one will be created for you. `[YUBIKEY PRESS]` will be included at the end of the name of any tasks that commit changes to the inventory repository in case a Yubikey is being used for signing commits.
+This variable controls whether or not to automatically handle versioning of the inventory with `git`. If set to `true` and a repository doesn't exist in the inventory directory, one will be created for you. `[YUBIKEY PRESS]` will be included at the end of the name of any tasks that commit changes to the inventory repository in case a Yubikey is being used for signing commits and requires a press or PIN entry.
 
 ```yaml
 inv_bu: false
 ```
 
-This variable is passed to the `backup` parameter of the Ansible `template`, `blockinfile` and `lineinfile` modules when modifying inventory files. While both or neither may be used, this should be considered an alternative to using `git`.
+This variable is passed to the `backup` parameter of the Ansible `template`, `blockinfile` and `lineinfile` modules when modifying inventory files. While both `inv_bu` and `inv_git` may be any combination of `true` and `false`, `inv_bu` should be considered an alternative to `inv_git` as enabling both would be redundant.
+
+#### Comment boilerplate
 
 ```yaml
 default_comment_prefix: "# vim: ts=8:sw=8:sts=8:noet:ft=cfg\n#"
@@ -29,7 +33,7 @@ yaml_comment_prefix: "# vim: ts=2:sw=2:sts=2:et:ft=yaml\n#"
 yaml_python_prefix: "# vim: ts=4:sw=4:sts=4:et:ft=python\n#"
 ```
 
-Comment prefixes are applied to the comment header of templated files based on file type. These values are used throughout the o0.o Ansible collections and are not limited to the local inventory.
+Comment prefixes are applied to the comment header of templated files based on file type. These values are used throughout the `o0_o` Ansible collections and are not limited to the local inventory.
 
 ```yaml
 default_comment_postfix: "#\n########################################################################"
@@ -43,6 +47,8 @@ safe_zone_comment: "# ADD CUSTOM CONFIGURATION BELOW ###########################
 
 The safe zone comment is used to separate inventory files between Ansible-managed blocks and user-managed blocks. Note that many Ansible managed blocks in the inventory are editable, and those are indicated by `(Editable)` at the end of the block's marker string.
 
+#### Operating system defaults
+
 ```yaml
 arch_defaults:
   archlinux: x86_64
@@ -53,6 +59,7 @@ arch_defaults:
   openbsd: amd64
   rocky: x86_64
   ubuntu: amd64
+  
 repo_defaults:
   archlinux:
     https:
@@ -78,6 +85,7 @@ repo_defaults:
   ubuntu:
     https:
       - mirrors.edge.kernel.org/ubuntu
+      
 release_defaults:
   archlinux: latest
   centos: '7.9.2009'
@@ -88,7 +96,7 @@ release_defaults:
   ubuntu: 'jammy' #22.04 LTS
 ```
 
-These are various default values for operating systems explicitly supported by the other roles in the `o0_o.host` collection. They are written to the `group_vars/all.yml` inventory filewhere they can be edited later.
+These are various default values for operating systems explicitly supported by the other roles in the `o0_o` Ansible collections. They are written to the `group_vars/all.yml` inventory file where they can be edited later (edits will persist through subsequent runs of this role).
 
 ## Dependencies
 
