@@ -6,7 +6,7 @@ This Ansible role generates inventory boilerplate on `localhost`.
 
 Only one inventory source should be provided and it should be a directory. If multiple inventory sources are provided, boilerplate is written to the first, which must be a directory. If the inventory source does not exist, it will be created as a directory.
 
-## Role Variables
+## Role variables
 
 ### Defaults
 
@@ -102,7 +102,7 @@ These are various default values for operating systems explicitly supported by t
 
 None
 
-## Example Playbook
+## Example playbook
 
 ```yaml
 - name: Example playbook using the o0_o.inventory role
@@ -117,6 +117,6 @@ None
 
 MIT
 
-## Author Information
+## Author information
 
 Email: o@o0-o.ooo
