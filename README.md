@@ -59,7 +59,7 @@ arch_defaults:
   openbsd: amd64
   rocky: x86_64
   ubuntu: amd64
-  
+
 repo_defaults:
   archlinux:
     https:
@@ -85,7 +85,7 @@ repo_defaults:
   ubuntu:
     https:
       - mirrors.edge.kernel.org/ubuntu
-      
+
 release_defaults:
   archlinux: latest
   centos: '7.9.2009'
@@ -105,7 +105,7 @@ None
 ## Example Playbook
 
 ```yaml
-- name: Example playbook using the o0_o.inventory collection
+- name: Example playbook using the o0_o.inventory role
   hosts: all
   gather_facts: false
   any_errors_fatal: true
