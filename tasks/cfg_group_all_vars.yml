@@ -41,6 +41,5 @@
   vars:
     yaml_wrapper_var:
       arch_defaults: "{{ arch_defaults }}"
-      repo_defaults: "{{ repo_defaults }}"
       release_defaults: "{{ release_defaults }}"
   notify: git commit inventory

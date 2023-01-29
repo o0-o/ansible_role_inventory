@@ -32,32 +32,6 @@ arch_defaults:
   rocky: x86_64
   ubuntu: amd64
 
-repo_defaults:
-  archlinux:
-    https:
-      - geo.mirror.pkgbuild.com
-  centos:
-    https:
-      - mirror.centos.org/centos
-  debian:
-    https:
-      - deb.debian.org/debian
-  fedora:
-    https:
-      - mirrors.fedoraproject.org/fedora
-  freebsd:
-    https:
-      - ftp.FreeBSD.org
-  openbsd:
-    https:
-      - cdn.openbsd.org/pub/OpenBSD
-  rocky:
-    https:
-      - mirrors.rockylinux.org
-  ubuntu:
-    https:
-      - mirrors.edge.kernel.org/ubuntu
-
 # Values here relate to mirror paths
 release_defaults:
   archlinux: latest
