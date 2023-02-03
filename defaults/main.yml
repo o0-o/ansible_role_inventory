@@ -21,6 +21,21 @@ default_comment_postfix: "#\n\
 safe_zone_comment: "\
   # ADD CUSTOM CONFIGURATION BELOW #######################################"
 
+# Host inventory variables
+inv_host_vars:
+  - ansible_host
+  - ansible_user
+  - ansible_python_interpreter
+  - ansible_become_method
+  - ansible_port
+  - ansible_ssh_private_key_file
+  - ansible_connection
+  - ansible_network_os
+  - ansible_network_cli_ssh_type
+  - tz
+  - locale
+  - mac
+
 # Operating system defaults (written to group_vars/all.yml)
 arch_defaults:
   archlinux: x86_64

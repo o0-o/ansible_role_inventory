@@ -13,30 +13,17 @@
       {{  inventory_dir
           | default( ansible_inventory_sources | first, true ) }}
 
-# Create the inventory directory.
-- name: "Create directory {{ inventory_dir }}"
+- name: Create inventory directories
   ansible.builtin.file:
-    path: "{{ inventory_dir }}"
+    path: "{{ inv_dir_item }}"
     state: directory
     mode: 0755
-
-# Create the host_vars directory.
-- name: "Create directory {{ hv_dir_var }}"
-  ansible.builtin.file:
-    path: "{{ hv_dir_var }}"
-    state: directory
-    mode: 0755
-  vars:
-    hv_dir_var: "{{ inventory_dir }}/host_vars"
-
-# Create the group_vars directory.
-- name: "Create directory {{ gv_dir_var }}"
-  ansible.builtin.file:
-    path: "{{ gv_dir_var }}"
-    state: directory
-    mode: 0755
-  vars:
-    gv_dir_var: "{{ inventory_dir }}/group_vars"
+  loop:
+    - "{{ inventory_dir }}"
+    - "{{ inventory_dir }}/host_vars"
+    - "{{ inventory_dir }}/group_vars"
+  loop_control:
+    loop_var: inv_dir_item
 
 # Create a group_vars file for each group, excluding the ungrouped group
 # or any group beginning with an underscore.

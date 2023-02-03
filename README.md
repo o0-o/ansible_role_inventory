@@ -47,6 +47,26 @@ safe_zone_comment: "# ADD CUSTOM CONFIGURATION BELOW ###########################
 
 The safe zone comment is used to separate inventory files between Ansible-managed blocks and user-managed blocks. Note that many Ansible managed blocks in the inventory are editable, and those are indicated by `(Editable)` at the end of the block's marker string.
 
+#### Inventory host variables
+
+```yaml
+inv_host_vars:
+  - ansible_host
+  - ansible_user
+  - ansible_python_interpreter
+  - ansible_become_method
+  - ansible_port
+  - ansible_ssh_private_key_file
+  - ansible_connection
+  - ansible_networ_os
+  - ansible_network_cli_ssh_type
+  - tz
+  - locale
+  - mac
+```
+
+These variables are proactively written to each host's `host_vars` file. They can be updated with the `update host inventory variables` handler.
+
 #### Operating system defaults
 
 ```yaml
@@ -71,6 +91,15 @@ release_defaults:
 ```
 
 These are various default values for operating systems explicitly supported by the other roles in the `o0_o` Ansible collections. They are written to the `group_vars/all.yml` inventory file where they can be edited later (edits will persist through subsequent runs of this role).
+
+### Vars
+
+```yaml
+pre_vars: "{{ hostvars[inventory_hostname] }}"
+```
+
+The `pre_vars` variable records a snapshot of the host's variables. This can be used later to see if values have changed.
+
 
 ## Dependencies
 

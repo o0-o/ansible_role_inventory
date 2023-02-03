@@ -5,6 +5,9 @@
 #
 ########################################################################
 
+- name: update host inventory variables
+  ansible.builtin.include_tasks: update_host_vars.yml
+
 - name: git commit inventory
   ansible.builtin.include_tasks: cfg_git.yml
   when: inv_git == true

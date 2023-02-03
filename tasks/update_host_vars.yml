@@ -1,0 +1,27 @@
+# vim: ts=2:sw=2:sts=2:et:ft=yaml.ansible
+#
+# Update the host's inventory (hostvars)
+#
+########################################################################
+
+- name: Update variables in host_vars files
+  ansible.builtin.lineinfile:
+    path: "{{ inventory_dir }}/host_vars/{{ inventory_hostname }}.yml"
+    regexp: "^#?{{ host_var_item }}:.*$"
+    insertbefore: EOF
+    firstmatch: true
+    line: "{{ line_var | trim }}"
+    backup: "{{ inv_bu }}"
+  delegate_to: 127.0.0.1
+  vars:
+    comment_var: "{{  ( vars[host_var_item] is defined )
+                      | ternary('', '#') }}"
+    line_var: >-
+      {{ comment_var }}{{ host_var_item }}: {{ vars[host_var_item] | default }}
+  when: >-
+    pre_vars[host_var_item] is undefined
+    or pre_vars[host_var_item] | default != vars[host_var_item]
+  loop: "{{ inv_host_vars }}"
+  loop_control:
+    loop_var: host_var_item
+  notify: git commit inventory

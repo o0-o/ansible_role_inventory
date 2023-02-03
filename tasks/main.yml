@@ -5,6 +5,10 @@
 #
 ########################################################################
 
+- name: Save state of host variables
+  ansible.builtin.set_fact:
+    pre_vars: "{{ hostvars[inventory_hostname] }}"
+
 - name: Run once on localhost
   run_once: true
   delegate_to: 127.0.0.1
