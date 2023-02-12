@@ -1,0 +1,45 @@
+# vim: ts=2:sw=2:sts=2:et:ft=yaml.ansible
+#
+# Update the host's inventory (hostvars) using the blockinfile module
+#
+# For use by the `update host inventory variables` handler.
+#
+########################################################################
+
+- name: "Update {{ host_var_key_item }} in host_vars files (blocks)"
+  ansible.builtin.blockinfile:
+    path: "{{ inventory_dir }}/host_vars/{{ inventory_hostname }}.yml"
+    insertbefore: EOF
+    marker: "{{ marker_var | trim }}"
+    block: "{{  block_var.splitlines()
+                | reject('match', reject_line_var)
+                | join('\n') }}"
+    backup: "{{ inv_bu }}"
+  delegate_to: 127.0.0.1
+  vars:
+    reject_line_var: "^\\s*'*$"
+    marker_var: >-
+      # {mark} ANSIBLE MANAGED BLOCK:
+      {{  host_var_inv_attrs_var['title']
+          | default(host_var_key_item) }}{{ host_var_inv_attrs_var['cfg']
+                                            | default(true)
+                                            | ternary(' (Editable)','') }}
+    header_var: "{{ ( host_var_inv_attrs_var['header'] is defined)
+                    | ternary(  host_var_inv_attrs_var['header']
+                                | default(omit)
+                                | trim
+                                | comment(prefix='', postfix='')
+                                | trim,
+                                '') }}"
+    block_var: |
+      {{ header_var }}
+      {{ comment_var }}{{ host_var_key_item }}:
+        {{  host_var_current_val_var
+            | default
+            | to_nice_yaml(width=1023, indent=2)
+            | indent(2) }}
+  when:
+    - >-
+        host_var_orig_val_var is undefined
+        or host_var_orig_val_var | default != host_var_current_val_var
+  notify: git commit inventory

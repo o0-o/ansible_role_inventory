@@ -5,7 +5,7 @@
 #
 ########################################################################
 
-# Need this when called by the handler
+# Need this here when called by the handler
 - name: Run once on localhost
   delegate_to: 127.0.0.1
   run_once: true
@@ -88,7 +88,7 @@
           - "--message={{ msg_var }}"
         chdir: "{{ inventory_dir }}"
       vars:
-        msg_var: "Automatic commit by the {{ byline }}"
+        msg_var: Automatic commit by the o0_o.inventory Ansible collection
       when:
         - ansible_check_mode == false
         - >-

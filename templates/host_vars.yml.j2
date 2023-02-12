@@ -5,9 +5,6 @@ Host variables file boilerplate
 #}
 ---
 {{ header_var }}
-
-{{ safe_zone_comment }}
-
 # Ansible variables
 #ansible_host:
 #ansible_user:
@@ -24,11 +21,15 @@ Host variables file boilerplate
 #locale:
 
 # Mandatory access control (SELinux, AppArmor, etc.)
+#
+# Set to an empty string to disable, otherwise hardcoded values are used
+# according to the OS/distribution.
 #mac:
 
 # Network management daemon (NetworkManager, systemd-networkd, etc.)
 #
-#   For use with the o0_o.network collection, use values 'nm' for
-#   NetworkManager and 'netd' for systemd-networkd. ifupdown is not
-#   supported.
+# Onlyl applicable to Linux distributions. Use netd for Systemd's
+# networkd or nm for NetworkManager.
 #net_mgr:
+
+########################################################################

@@ -5,39 +5,64 @@
 #
 ########################################################################
 
-- name: Save state of host variables
+- name: Save initial state of host variables
   ansible.builtin.set_fact:
     pre_vars: "{{ hostvars[inventory_hostname] }}"
+  when: pre_vars is undefined
 
-- name: Run once on localhost
-  run_once: true
+- name: Define the inventory directory
+  ansible.builtin.set_fact:
+    inventory_dir: "{{  inv_src_is_dir_var
+                        | bool
+                        | ternary(inv_src_var, inv_src_dir_var) }}"
+  vars:
+    inv_src_var: "{{ ansible_inventory_sources | first }}"
+    inv_src_dir_var: "{{ inv_src_var | dirname }}"
+    pipe_cmd_var: "[ -d {{ inv_src_var | quote }} ] && echo true || echo false"
+    inv_src_is_dir_var: "{{ lookup('ansible.builtin.pipe', pipe_cmd_var) }}"
+  when: inventory_dir is undefined
+
+- name: Run on localhost
   delegate_to: 127.0.0.1
   block:
 
-    # If using a collection, pull its metadata into a variable.
-    - name: Define collection
-      ansible.builtin.include_tasks: def_collect.yml
-      vars:
-        collect_meta_file_var: "{{  ansible_parent_role_paths
-                                    | default( [role_path] )
-                                    | first
-                                    | dirname
-                                    | dirname }}/galaxy.yml"
+    - name: Run once
+      run_once: true
+      block:
 
-    # The comment header will include collection metadata or will fall
-    # back to using role metadata if running outside of a collection.
-    - name: Run tasks to define comment header
-      ansible.builtin.include_tasks: def_comment_header.yml
+        - name: Create inventory directories
+          ansible.builtin.file:
+            path: "{{ inv_dir_item }}"
+            state: directory
+            mode: 0755
+          loop:
+            - "{{ inventory_dir }}"
+            - "{{ inventory_dir }}/host_vars"
+            - "{{ inventory_dir }}/group_vars"
+          loop_control:
+            loop_var: inv_dir_item
 
-    # Apply inventory boilerplate in cases where inventory, host and
-    # group variables files don't exist. Do not modify any files that
-    # do exist.
+        # The comment header will include collection metadata or will fall
+        # back to using role metadata if running outside of a collection.
+        - name: Run tasks to define comment header
+          ansible.builtin.include_tasks: def_comment_header.yml
+
+        # Apply inventory boilerplate in cases where group variables
+        # files don't exist. Write defaults to all.yml, otherwise do not
+        # modify any files that do exist.
+        - name: Run tasks to configure inventory directories and variables files
+          ansible.builtin.include_tasks: cfg_group_vars.yml
+          vars:
+            all_gv_file_var: "{{ inventory_dir }}/group_vars/all.yml"
+
+    # Apply inventory boilerplate in cases where host variables files
+    # don't exist. Do not modify any files that do exist.
     - name: Run tasks to configure inventory directories and variables files
-      ansible.builtin.include_tasks: cfg_inv.yml
+      ansible.builtin.include_tasks: cfg_host_vars.yml
 
-    # If automatic git versioning will be used on the inventory, set up
-    # the repository and make a preliminary commit unless there are no
-    # pending changes.
-    - name: Run tasks to configure git versioning of the inventory
-      ansible.builtin.include_tasks: cfg_git.yml
-      when: inv_git == true
+# If automatic git versioning will be used on the inventory, set up the
+# repository and make a preliminary commit unless there are no pending
+# changes.
+- name: Run tasks to configure git versioning of the inventory
+  ansible.builtin.include_tasks: cfg_git.yml
+  when: inv_git == true

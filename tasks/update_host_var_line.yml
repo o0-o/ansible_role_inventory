@@ -1,0 +1,28 @@
+# vim: ts=2:sw=2:sts=2:et:ft=yaml.ansible
+#
+# Update the host's inventory (hostvars) using the lineinfile module
+#
+# For use by the `update host inventory variables` handler.
+#
+########################################################################
+
+- name: "Update {{ host_var_key_item }} in host_vars files (lines)"
+  ansible.builtin.lineinfile:
+    path: "{{ inventory_dir }}/host_vars/{{ inventory_hostname }}.yml"
+    regexp: "^#?{{ host_var_key_item }}:.*$"
+    insertbefore: EOF
+    firstmatch: true
+    line: "{{ line_var | trim }}"
+    backup: "{{ inv_bu }}"
+  delegate_to: 127.0.0.1
+  vars:
+    line_var: >-
+      {{ comment_var }}{{ host_var_key_item }}:
+      {{ host_var_current_val_var | default }}
+  when:
+    - >-
+      host_var_orig_val_var is undefined
+      or host_var_orig_val_var | default != host_var_current_val_var
+      or host_var_key_item == 'ansible_connection'
+  notify: git commit inventory
+# NOTE: ansible_connection is quirky so we always run in that case

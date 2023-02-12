@@ -1,10 +1,12 @@
 ---
 # vim: ts=2:sw=2:sts=2:et:ft=yaml.ansible
 #
-# Configure the group_vars/group.yml files (except all.yml)
+# Configure group_vars/group.yml files
 #
 ########################################################################
 
+# Create a group_vars file for each group, excluding the ungrouped group
+# or any group beginning with an underscore.
 - name: Template group variables files if they doesn't exist
   ansible.builtin.template:
     src: group_vars.yml.j2
@@ -20,12 +22,11 @@
           | wordwrap(70)
           | comment(  prefix=yaml_comment_prefix,
                       postfix=default_comment_postfix ) }}"
-  notify: git commit inventory
-
-- name: Write YAML header to group variables files
-  ansible.builtin.lineinfile:
-    path: "{{ gv_file_var }}"
-    insertbefore: BOF
-    line: ---
-    mode: 0644
+  loop: "{{ groups.keys()
+            | list
+            | reject('==', 'ungrouped')
+            | reject('match', '^_.*$')
+            | union( new_groups | default([]) ) }}"
+  loop_control:
+    loop_var: group_item
   notify: git commit inventory

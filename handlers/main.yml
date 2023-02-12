@@ -6,8 +6,21 @@
 ########################################################################
 
 - name: update host inventory variables
-  ansible.builtin.include_tasks: update_host_vars.yml
+  ansible.builtin.include_tasks: "update_host_var_{{ module_var }}.yml"
+  vars:
+    host_var_inv_attrs_var: "{{ inv_host_vars[host_var_key_item] }}"
+    host_var_current_val_var: "{{ vars[host_var_key_item] }}"
+    host_var_orig_val_var: "{{ pre_vars[host_var_key_item] }}"
+    comment_var: "{{  ( host_var_current_val_var is defined )
+                      | ternary('', '#') }}"
+    module_var: "{{ inv_host_vars[host_var_key_item]['block']
+                    | default(false)
+                    | ternary('block', 'line') }}"
+  loop: "{{ inv_host_vars.keys() | list }}"
+  loop_control:
+    loop_var: host_var_key_item
 
 - name: git commit inventory
   ansible.builtin.include_tasks: cfg_git.yml
   when: inv_git == true
+  listen: update host inventory variables
