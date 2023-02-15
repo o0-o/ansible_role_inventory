@@ -1,5 +1,5 @@
 galaxy_info:
-  role_name: o0_o.inventory
+  role_name: inventory
   author: o0-o <o@o0-o.ooo>
   description: Generate inventory boilerplate and define sane defaults
   #company: your company (optional)
@@ -51,9 +51,6 @@ galaxy_info:
       versions:
         - all
     - name: macOS
-      versions:
-        - all
-    - name: RouterOS
       versions:
         - all
 
