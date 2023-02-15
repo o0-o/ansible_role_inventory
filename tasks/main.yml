@@ -65,4 +65,4 @@
 # changes.
 - name: Run tasks to configure git versioning of the inventory
   ansible.builtin.include_tasks: cfg_git.yml
-  when: inv_git == true
+  when: inv_git

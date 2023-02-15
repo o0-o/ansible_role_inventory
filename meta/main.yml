@@ -1,5 +1,6 @@
 galaxy_info:
   role_name: inventory
+  namespace: o0_o
   author: o0-o <o@o0-o.ooo>
   description: Generate inventory boilerplate and define sane defaults
   #company: your company (optional)
@@ -16,10 +17,9 @@ galaxy_info:
   # - GPL-3.0-only
   # - Apache-2.0
   # - CC-BY-4.0
-  license:
-    - MIT
+  license: MIT
 
-  min_ansible_version: 2.11
+  min_ansible_version: '2.11'
 
   # If this a Container Enabled role, provide the minimum Ansible
   # Container version.
@@ -44,13 +44,7 @@ galaxy_info:
   #   - 1.0
   #   - 7
   #   - 99.99
-    - name: GenericUnix
-      versions:
-        - all
-    - name: GenericBSD
-      versions:
-        - all
-    - name: macOS
+    - name: GenericUNIX
       versions:
         - all
 

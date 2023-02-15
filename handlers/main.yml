@@ -22,5 +22,5 @@
 
 - name: git commit inventory
   ansible.builtin.include_tasks: cfg_git.yml
-  when: inv_git == true
+  when: inv_git
   listen: update host inventory variables

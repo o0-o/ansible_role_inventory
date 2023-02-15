@@ -1,0 +1,13 @@
+---
+exclude_paths:
+  - .cache/
+  - tests/*
+  - travis.yml
+  - .DS_Store
+  - .git
+skip_list:
+  - command-instead-of-module
+  - name[template]
+  - name[casing]
+  - jinja[spacing]
+  - yaml[comments]

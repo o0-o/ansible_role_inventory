@@ -22,7 +22,7 @@
       register: git_inv_tl_reg
       failed_when: git_inv_tl_reg['rc'] | int not in [0, 128]
       changed_when:
-        - ansible_check_mode == true
+        - ansible_check_mode
         - >-
           git_inv_tl_reg['rc'] | int == 128
           or git_inv_tl_reg['stdout_lines'][0] != inventory_dir
@@ -34,7 +34,7 @@
           - init
         chdir: "{{ inventory_dir }}"
       when:
-        - ansible_check_mode == false
+        - not ansible_check_mode
         - >-
           git_inv_tl_reg['rc'] | int == 128
           or git_inv_tl_reg['stdout_lines'][0] != inventory_dir
@@ -51,7 +51,7 @@
         chdir: "{{ inventory_dir }}"
       register: git_inv_mod_untracked_reg
       changed_when:
-        - ansible_check_mode == true
+        - ansible_check_mode
         - git_inv_mod_untracked_reg['stdout_lines'] != []
 
     - name: Add all files in the inventory directory to the git repository
@@ -62,7 +62,7 @@
           - .
         chdir: "{{ inventory_dir }}"
       when:
-        - ansible_check_mode == false
+        - not ansible_check_mode
         - git_inv_mod_untracked_reg['stdout_lines'] != []
 
     - name: List commits to the local inventory repository
@@ -75,7 +75,7 @@
         chdir: "{{ inventory_dir }}"
       register: git_inv_cache_mod_reg
       changed_when:
-        - ansible_check_mode == true
+        - ansible_check_mode
         - git_inv_cache_mod_reg['stdout_lines'] != []
 
     # If commit signing is enabled and a Yubikey is used for signing,
@@ -90,7 +90,7 @@
       vars:
         msg_var: Automatic commit by the o0_o.inventory Ansible collection
       when:
-        - ansible_check_mode == false
+        - not ansible_check_mode
         - >-
           git_inv_cache_mod_reg['stdout_lines'] != []
           or git_inv_mod_untracked_reg['stdout_lines'] != []
