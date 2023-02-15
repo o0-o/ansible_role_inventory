@@ -1,0 +1,41 @@
+---
+# vim: ts=2:sw=2:sts=2:et:ft=yaml.ansible
+#
+# Inventory defaults
+#
+########################################################################
+
+# Comment defaults (written to group_vars/all.yml)
+default_comment_prefix: "# vim: ts=8:sw=8:sts=8:noet:ft=cfg\n#"
+ansible_comment_prefix: "# vim: ts=2:sw=2:sts=2:et:ft=yaml.ansible\n#"
+yaml_comment_prefix: "# vim: ts=2:sw=2:sts=2:et:ft=yaml\n#"
+yaml_python_prefix: "# vim: ts=4:sw=4:sts=4:et:ft=python\n#"
+# 72 character comment width per PEP8
+default_comment_postfix: "#\n\
+  ########################################################################\n"
+
+# Use git to automatically version inventory files.
+inv_git: true
+# Use Ansible's backup feature when making changes to inventory files.
+inv_bu: false
+
+# Host inventory variables
+inv_host_vars:
+  ansible_host:
+  ansible_user:
+  ansible_python_interpreter:
+  ansible_become_method:
+  ansible_port:
+  ansible_ssh_private_key_file:
+  ansible_connection:
+  ansible_network_os:
+  ansible_network_cli_ssh_type:
+  tz:
+  locale:
+  mac:
+  repos:
+    block: true
+    title: Repositories
+  net_mgr:
+    block: true
+    title: Network management daemon
