@@ -20,9 +20,8 @@
       {{ comment_var }}{{ host_var_key_item }}:
       {{ host_var_current_val_var | default }}
   when:
-    - >-
-      host_var_orig_val_var is undefined
-      or host_var_orig_val_var | default != host_var_current_val_var
-      or host_var_key_item == 'ansible_connection'
+    host_var_orig_val_var is undefined
+    or host_var_orig_val_var | default != host_var_current_val_var | default
+    or host_var_key_item == 'ansible_connection'
   notify: git commit inventory
 # NOTE: ansible_connection is quirky so we always run in that case
