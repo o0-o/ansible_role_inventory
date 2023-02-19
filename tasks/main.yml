@@ -10,6 +10,15 @@
     pre_vars: "{{ hostvars[inventory_hostname] }}"
   when: pre_vars is undefined
 
+- name: BEGIN INVENTORY ROLE
+  ansible.builtin.set_fact:
+    role_call_ident: "{{ ident_var }}"
+    role_call: "{{ role_call | default([]) + line_var }}"
+  vars:
+    ident_var: "{{ role_call_ident | default(-1) | int + 1 }}"
+    line_var:
+      - "{{ ( '  ' * ident_var | int ) | string + ansible_role_name }}"
+
 - name: Define the inventory directory
   ansible.builtin.set_fact:
     inventory_dir: "{{  inv_src_is_dir_var
@@ -66,3 +75,7 @@
 - name: Run tasks to configure git versioning of the inventory
   ansible.builtin.include_tasks: cfg_git.yml
   when: inv_git
+
+- name: END INVENTORY ROLE
+  ansible.builtin.set_fact:
+    role_call_ident: "{{ role_call_ident | int - 1 }}"
