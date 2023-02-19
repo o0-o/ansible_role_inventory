@@ -17,11 +17,10 @@
   vars:
     gv_file_var: "{{ inventory_dir }}/group_vars/{{ group_item }}.yml"
     title_var: "Group Variables - {{ group_item }}"
-    header_var: "\
-      {{  ( title_var + '\n \n' + default_comment_header )
-          | wordwrap(70)
-          | comment(  prefix=yaml_comment_prefix,
-                      postfix=default_comment_postfix ) }}"
+    header_var: "{{ ( title_var + '\n \n' + default_comment_header )
+                    | wordwrap(70)
+                    | comment(  prefix=yaml_comment_prefix,
+                                postfix=default_comment_postfix ) }}"
   loop: "{{ groups.keys()
             | list
             | reject('==', 'ungrouped')
