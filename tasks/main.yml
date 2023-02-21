@@ -19,18 +19,6 @@
     line_var:
       - "{{ ( '  ' * ident_var | int ) | string + ansible_role_name }}"
 
-- name: Define the inventory directory
-  ansible.builtin.set_fact:
-    inventory_dir: "{{  inv_src_is_dir_var
-                        | bool
-                        | ternary(inv_src_var, inv_src_dir_var) }}"
-  vars:
-    inv_src_var: "{{ ansible_inventory_sources | first }}"
-    inv_src_dir_var: "{{ inv_src_var | dirname }}"
-    pipe_cmd_var: "[ -d {{ inv_src_var | quote }} ] && echo true || echo false"
-    inv_src_is_dir_var: "{{ lookup('ansible.builtin.pipe', pipe_cmd_var) }}"
-  when: inventory_dir is undefined
-
 - name: Run on localhost
   delegate_to: 127.0.0.1
   block:
@@ -38,6 +26,42 @@
     - name: Run once
       run_once: true
       block:
+
+        # These are defined in defaults/main.yml so that values may be
+        # overridden in the inventory. However, defaults do not persist
+        # across roles when the role is included as a dependency in
+        # meta/main.yml. As a result, they are defined both in
+        # defaults/main.yml and here so that they have the precedence of
+        # defaults and the persistence of vars.
+        - name: Scope comment prefixes and postfixes for general use
+          ansible.builtin.set_fact:
+            "{{ comment_item }}": "{{ vars[comment_item] }}"
+          loop:
+            - default_comment_prefix
+            - ansible_comment_prefix
+            - yaml_comment_prefix
+            - yaml_python_prefix
+            - default_comment_postfix
+          loop_control:
+            loop_var: comment_item
+
+        # If the first inventory source is a directory, that is the
+        # inventory directory. If it is a file, then it is the directory
+        # containing that file. Specifying multiple inventory sources
+        # in different directories is discouraged as host_vars and
+        # group_vars directories will only correspond to the first
+        # inventory source.
+        - name: Define the inventory directory
+          ansible.builtin.set_fact:
+            inventory_dir: "{{  inv_src_is_dir_var
+                                | bool
+                                | ternary(inv_src_var, inv_src_dir_var) }}"
+          vars:
+            inv_src_var: "{{ ansible_inventory_sources | first }}"
+            inv_src_dir_var: "{{ inv_src_var | dirname }}"
+            pipe_cmd_var: "[ -d {{ inv_src_var | quote }} ] && echo true || echo false"
+            inv_src_is_dir_var: "{{ lookup('ansible.builtin.pipe', pipe_cmd_var) }}"
+          when: inventory_dir is undefined
 
         - name: Create inventory directories
           ansible.builtin.file:
@@ -51,22 +75,18 @@
           loop_control:
             loop_var: inv_dir_item
 
-        # The comment header will include collection metadata or will fall
-        # back to using role metadata if running outside of a collection.
-        - name: Run tasks to define comment header
-          ansible.builtin.include_tasks: def_comment_header.yml
-
         # Apply inventory boilerplate in cases where group variables
         # files don't exist. Write defaults to all.yml, otherwise do not
         # modify any files that do exist.
-        - name: Run tasks to configure inventory directories and variables files
+        - name: Run tasks to configure group variables inventory directories
+            and files
           ansible.builtin.include_tasks: cfg_group_vars.yml
           vars:
             all_gv_file_var: "{{ inventory_dir }}/group_vars/all.yml"
 
     # Apply inventory boilerplate in cases where host variables files
     # don't exist. Do not modify any files that do exist.
-    - name: Run tasks to configure inventory directories and variables files
+    - name: Run tasks to configure host variables inventory directories files
       ansible.builtin.include_tasks: cfg_host_vars.yml
 
 # If automatic git versioning will be used on the inventory, set up the
