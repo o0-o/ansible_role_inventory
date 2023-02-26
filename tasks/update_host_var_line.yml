@@ -10,8 +10,7 @@
   ansible.builtin.lineinfile:
     path: "{{ inventory_dir }}/host_vars/{{ inventory_hostname }}.yml"
     regexp: "^#?{{ host_var_key_item }}:.*$"
-    insertbefore: EOF
-    firstmatch: true
+    insertafter: "{{ ansible_lines_comment_prefix }}"
     line: "{{ line_var | trim }}"
     backup: "{{ inv_bu }}"
   delegate_to: 127.0.0.1

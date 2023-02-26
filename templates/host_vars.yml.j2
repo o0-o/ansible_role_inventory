@@ -5,6 +5,8 @@ Host variables file boilerplate
 #}
 ---
 {{ header_var }}
+{{ ansible_lines_comment_prefix }}
+
 # Ansible variables
 #ansible_host:
 #ansible_user:
@@ -28,8 +30,8 @@ Host variables file boilerplate
 
 # Network management daemon (NetworkManager, systemd-networkd, etc.)
 #
-# Onlyl applicable to Linux distributions. Use netd for Systemd's
+# Only applicable to Linux distributions. Use netd for Systemd's
 # networkd or nm for NetworkManager.
 #net_mgr:
 
-########################################################################
+{{ ansible_blocks_comment_prefix }}

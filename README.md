@@ -33,6 +33,15 @@ default_comment_postfix: "#\n###################################################
 
 The comment postfix is applied to the comment header of templated files (also not limited to the local inventory). This uses a 72-character width [as defined in PEP8](https://peps.python.org/pep-0008/#maximum-line-length).
 
+```yaml
+ansible_lines_comment_prefix: "\
+  ################# ANSIBLE MANAGED LINES (CONFIGURABLE) #################"
+ansible_blocks_comment_prefix: "\
+  ######################## ANSIBLE MANAGED BLOCKS ########################"
+```
+
+The comment dividers provide structure for parts of the inventory that are managed by this role.
+
 ### Variables
 
 ```yaml
@@ -71,12 +80,13 @@ inv_host_vars:
   tz:
   locale:
   mac:
+  net_mgr:
   repos:
     block: true
-    title: Repositories
-  net_mgr:
-    block: true
-    title: Network management daemon
+    title: Software Repositories
+    header: >
+      Default repositories are configured in the o0_o.host.software_management
+      role (see defaults/main/ in that role).
 ```
 
 These variables are proactively written to each host's `host_vars` file. They can be updated with the `update host inventory variables` handler.

@@ -9,7 +9,7 @@
 - name: "Update {{ host_var_key_item }} in host_vars files (blocks)"
   ansible.builtin.blockinfile:
     path: "{{ inventory_dir }}/host_vars/{{ inventory_hostname }}.yml"
-    insertbefore: EOF
+    insertafter: "{{ ansible_blocks_comment_prefix }}"
     marker: "{{ marker_var | trim }}"
     block: "{{  block_var.splitlines()
                 | reject('match', reject_line_var)
@@ -18,21 +18,22 @@
   delegate_to: 127.0.0.1
   vars:
     reject_line_var: "^\\s*'*$"
+    title_var: "{{  host_var_inv_attrs_var['title']
+                    | default(host_var_key_item) }}"
+    cfg_var: "{{ host_var_inv_attrs_var['cfg'] | default(true) }}"
+    header_var: "{{ host_var_inv_attrs_var['header'] }}"
     marker_var: >-
       # {mark} ANSIBLE MANAGED BLOCK:
-      {{  host_var_inv_attrs_var['title']
-          | default(host_var_key_item) }}{{ host_var_inv_attrs_var['cfg']
-                                            | default(true)
-                                            | ternary(' (Editable)','') }}
-    header_var: "{{ ( host_var_inv_attrs_var['header'] is defined)
-                    | ternary(  host_var_inv_attrs_var['header']
-                                | default('')
-                                | trim
-                                | comment(prefix='', postfix='')
-                                | trim,
-                                '') }}"
+      {{ title_var }}{{ cfg_var | ternary(' (Editable)','') }}
+    header_fmt_var: >-
+      {{  ( header_var is defined )
+          | ternary(  header_var
+                      | default('')
+                      | wordwrap(70)
+                      | comment,
+                      '') }}
     block_var: |
-      {{ header_var }}
+      {{ header_fmt_var | trim }}
       {{ comment_var }}{{ host_var_key_item }}:
         {{  host_var_current_val_var
             | default

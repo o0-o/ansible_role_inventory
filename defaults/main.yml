@@ -13,6 +13,10 @@ yaml_python_prefix: "# vim: ts=4:sw=4:sts=4:et:ft=python\n#"
 # 72 character comment width per PEP8
 default_comment_postfix: "#\n\
   ########################################################################\n"
+ansible_lines_comment_prefix: "\
+  ################# ANSIBLE MANAGED LINES (CONFIGURABLE) #################"
+ansible_blocks_comment_prefix: "\
+  ######################## ANSIBLE MANAGED BLOCKS ########################"
 
 # Use git to automatically version inventory files.
 inv_git: true
@@ -33,9 +37,13 @@ inv_host_vars:
   tz:
   locale:
   mac:
+  net_mgr:
   repos:
     block: true
-    title: Repositories
-  net_mgr:
+    title: Software repositories
+    header: >
+      Default repositories are configured in the o0_o.host.software_management
+      role (see defaults/main/ in that role).
+  users:
     block: true
-    title: Network management daemon
+    title: Local users

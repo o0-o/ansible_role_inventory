@@ -59,8 +59,10 @@
           vars:
             inv_src_var: "{{ ansible_inventory_sources | first }}"
             inv_src_dir_var: "{{ inv_src_var | dirname }}"
-            pipe_cmd_var: "[ -d {{ inv_src_var | quote }} ] && echo true || echo false"
-            inv_src_is_dir_var: "{{ lookup('ansible.builtin.pipe', pipe_cmd_var) }}"
+            pipe_cmd_var: >-
+              [ -d {{ inv_src_var | quote }} ] && echo true || echo false
+            inv_src_is_dir_var: >-
+              {{ lookup('ansible.builtin.pipe', pipe_cmd_var) }}
           when: inventory_dir is undefined
 
         - name: Create inventory directories
