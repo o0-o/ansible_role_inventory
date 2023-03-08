@@ -14,7 +14,7 @@ yaml_python_prefix: "# vim: ts=4:sw=4:sts=4:et:ft=python\n#"
 default_comment_postfix: "#\n\
   ########################################################################\n"
 ansible_lines_comment_prefix: "\
-  ################# ANSIBLE MANAGED LINES (CONFIGURABLE) #################"
+  ################### ANSIBLE MANAGED LINES (EDITABLE) ###################"
 ansible_blocks_comment_prefix: "\
   ######################## ANSIBLE MANAGED BLOCKS ########################"
 
